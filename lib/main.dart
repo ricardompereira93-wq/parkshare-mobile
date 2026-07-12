@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screens/login_screen.dart';
 
 void main() {
   runApp(const ParkShareApp());
@@ -290,6 +291,7 @@ class UserTypeScreen extends StatelessWidget {
               const SizedBox(height: 40),
 
               buildCard(
+                context: context,
                 icon: '🚗',
                 title: 'Sou Condutor',
                 subtitle:
@@ -299,6 +301,7 @@ class UserTypeScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               buildCard(
+                context: context,
                 icon: '🏠',
                 title: 'Sou Proprietário',
                 subtitle:
@@ -311,61 +314,73 @@ class UserTypeScreen extends StatelessWidget {
     );
   }
 
-  Widget buildCard({
-    required String icon,
-    required String title,
-    required String subtitle,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: const Color(0xFFE5E7EB),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            icon,
-            style: const TextStyle(
-              fontSize: 42,
-            ),
-          ),
+Widget buildCard({
+required BuildContext context,
+required String icon,
+required String title,
+required String subtitle,
+}) {
+return InkWell(
+borderRadius: BorderRadius.circular(22),
+onTap: () {
+Navigator.push(
+context,
+MaterialPageRoute(
+builder: (_) => const LoginScreen(),
+),
+);
+},
+child: Container(
+width: double.infinity,
+padding: const EdgeInsets.all(24),
+decoration: BoxDecoration(
+color: Colors.white,
+borderRadius: BorderRadius.circular(22),
+border: Border.all(
+color: const Color(0xFFE5E7EB),
+),
+boxShadow: [
+BoxShadow(
+color: Colors.black.withValues(alpha: 0.05),
+blurRadius: 12,
+offset: const Offset(0, 4),
+),
+],
+),
+child: Column(
+crossAxisAlignment: CrossAxisAlignment.start,
+children: [
+Text(
+icon,
+style: const TextStyle(
+fontSize: 42,
+),
+),
 
-          const SizedBox(height: 20),
+const SizedBox(height: 20),
 
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1B2A4A),
-            ),
-          ),
+Text(
+title,
+style: const TextStyle(
+fontSize: 24,
+fontWeight: FontWeight.bold,
+color: Color(0xFF1B2A4A),
+),
+),
 
-          const SizedBox(height: 10),
+const SizedBox(height: 10),
 
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+Text(
+subtitle,
+style: const TextStyle(
+fontSize: 16,
+color: Colors.black54,
+height: 1.4,
+),
+),
+],
+),
+),
+);
+}
 }
