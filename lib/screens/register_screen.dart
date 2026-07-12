@@ -1,7 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  bool _loading = false;
+
+  Future<void> _signUp() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('As passwords não coincidem'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      setState(() {
+        _loading = true;
+      });
+
+      await Supabase.instance.client.auth.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        data: {
+          'name': _nameController.text.trim(),
+        },
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Conta criada com sucesso. Verifique o seu email.',
+          ),
+        ),
+      );
+    } on AuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro: $e'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +103,7 @@ class RegisterScreen extends StatelessWidget {
             const SizedBox(height: 30),
 
             TextField(
+              controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Nome',
                 border: OutlineInputBorder(
@@ -39,6 +115,7 @@ class RegisterScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             TextField(
+              controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(
@@ -50,6 +127,7 @@ class RegisterScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             TextField(
+              controller: _passwordController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
@@ -62,6 +140,7 @@ class RegisterScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             TextField(
+              controller: _confirmPasswordController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Confirmar Password',
@@ -77,14 +156,20 @@ class RegisterScreen extends StatelessWidget {
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: _loading ? null : _signUp,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1B2A4A),
                   foregroundColor: Colors.white,
                 ),
-                child: const Text(
+                child: _loading
+                    ? const CircularProgressIndicator(
+                  color: Colors.white,
+                )
+                    : const Text(
                   'Criar Conta',
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
                 ),
               ),
             ),
